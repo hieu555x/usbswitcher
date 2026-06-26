@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:usbswitcher/bloc/theme/theme_bloc.dart';
 import 'package:usbswitcher/bloc/theme/theme_event.dart';
 import 'package:usbswitcher/bloc/theme/theme_state.dart';
+import 'package:usbswitcher/screens/usb_debugger_screen.dart';
 import 'package:usbswitcher/widgets/error_widget.dart';
 import 'package:usbswitcher/widgets/permission_denied_widget.dart';
-import 'package:usbswitcher/widgets/usb_toggle_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -106,7 +106,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             behavior: SnackBarBehavior.floating,
             backgroundColor: newValue ? Colors.green[700] : Colors.grey[800],
             content: Text(
-              newValue ? '✅ Đã bật USB Debugging' : '⛔ Đã tắt USB Debugging',
+              newValue ? '✅ Usb Debugging is ON' : '⛔  Usb Debugging is OFF',
+              style: TextStyle(color: Colors.white),  
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -129,52 +130,54 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('USB Switcher'),
-            centerTitle: true,
-            leading: IconButton(
-              onPressed: () {
-                context.read<ThemeBloc>().add(ThemeToggle());
-              },
-              icon: Icon(
-                themeData.brightness == Brightness.dark
-                    ? Icons.sunny
-                    : Icons.dark_mode,
-              ),
+            title: Row(
+              children: [
+                Icon(Icons.usb_sharp, size: 32),
+                Text(
+                  "USB DEBUGGER",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
+            centerTitle: false,
             actions: [
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: _loading ? null : _refreshStatus,
                 tooltip: 'Làm mới trạng thái',
               ),
+              IconButton(
+                onPressed: () {
+                  context.read<ThemeBloc>().add(ThemeToggle());
+                },
+                icon: Icon(
+                  themeData.brightness == Brightness.dark
+                      ? Icons.sunny
+                      : Icons.dark_mode,
+                ),
+              ),
             ],
-            backgroundColor: Colors.transparent,
             elevation: 0,
             toolbarHeight: 60,
           ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: _loading
-                  ? const CircularProgressIndicator()
-                  : !_hasPermission
-                  ? PermissionDeniedWidget(
-                      onRefresh: _refreshStatus,
-                      isLoading: _loading,
-                    )
-                  : _errorMessage != null
-                  ? ErrorWidget(
-                      errorMessage: _errorMessage,
-                      onRefresh: _refreshStatus,
-                      isLoading: _loading,
-                    )
-                  : UsbToggleCard(
-                      isEnabled: _isEnabled,
-                      onToggle: _toggle,
-                      isLoading: _loading,
-                    ),
-            ),
-          ),
+          body: _loading
+              ? const CircularProgressIndicator()
+              : !_hasPermission
+              ? PermissionDeniedWidget(
+                  onRefresh: _refreshStatus,
+                  isLoading: _loading,
+                )
+              : _errorMessage != null
+              ? ErrorWidget(
+                  errorMessage: _errorMessage,
+                  onRefresh: _refreshStatus,
+                  isLoading: _loading,
+                )
+              : UsbDebuggerScreen(
+                  isEnabled: _isEnabled,
+                  onToggle: _toggle,
+                  isLoading: _loading,
+                ),
         );
       },
     );
