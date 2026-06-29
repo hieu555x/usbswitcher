@@ -4,6 +4,7 @@ import android.provider.Settings
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import android.content.Intent
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "usb_debug_channel"
@@ -42,6 +43,7 @@ class MainActivity : FlutterActivity() {
                                 if (enabled) 1 else 0
                             )
                             result.success(null)
+                            UsbWidgetProvider.updateAllWidgets(this)
                         } catch (e: SecurityException) {
                             result.error(
                                 "PERMISSION_DENIED",
@@ -50,6 +52,24 @@ class MainActivity : FlutterActivity() {
                             )
                         } catch (e: Exception) {
                             result.error("UNKNOWN_ERROR", e.message, null)
+                        }
+                    }
+
+                    "openDeviceInfoSettings" -> {
+                        try {
+                            val intent = Intent(Settings.ACTION_DEVICE_INFO_SETTINGS)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                            result.success(null)
+                        } catch (e: Exception) {
+                            try {
+                                val fallbackIntent = Intent(Settings.ACTION_SETTINGS)
+                                fallbackIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                startActivity(fallbackIntent)
+                                result.success(null)
+                            } catch (e2: Exception) {
+                                result.error("UNKNOWN_ERROR", e2.message, null)
+                            }
                         }
                     }
 

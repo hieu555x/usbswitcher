@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _loading = false;
       });
 
-      // Update theme state with USB status for initial app launch
       context.read<ThemeBloc>().add(UsbStatusChanged(enabled));
     } on PlatformException catch (e) {
       setState(() {
@@ -107,7 +106,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: newValue ? Colors.green[700] : Colors.grey[800],
             content: Text(
               newValue ? '✅ Usb Debugging is ON' : '⛔  Usb Debugging is OFF',
-              style: TextStyle(color: Colors.white),  
+              style: TextStyle(color: Colors.white),
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -119,6 +118,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         setState(() => _hasPermission = false);
       } else {
         setState(() => _errorMessage = e.message ?? 'Đã có lỗi xảy ra');
+      }
+    }
+  }
+
+  Future<void> _openDeviceInfoSetting() async {
+    try {
+      await _channel.invokeMethod('openDeviceInfoSettings');
+    } on PlatformException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to open the setting: ${e.message}')),
+        );
       }
     }
   }
@@ -177,6 +188,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   isEnabled: _isEnabled,
                   onToggle: _toggle,
                   isLoading: _loading,
+                  onTap: _openDeviceInfoSetting,
                 ),
         );
       },

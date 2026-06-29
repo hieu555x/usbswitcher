@@ -5,6 +5,7 @@ class StepCard extends StatelessWidget {
   final String title;
   final String desc;
   final bool showLinkIcon;
+  final VoidCallback? onTap;
 
   const StepCard({
     super.key,
@@ -12,6 +13,7 @@ class StepCard extends StatelessWidget {
     required this.title,
     required this.desc,
     this.showLinkIcon = false,
+    this.onTap,
   });
 
   @override
@@ -73,7 +75,10 @@ class StepCard extends StatelessWidget {
           ),
           if (showLinkIcon) ...[
             SizedBox(width: 8),
-            Icon(Icons.open_in_new, size: 20, color: Colors.blue[700]),
+            InkWell(
+              onTap: onTap,
+              child: Icon(Icons.open_in_new, size: 20, color: Colors.blue[700]),
+            ),
           ],
         ],
       ),

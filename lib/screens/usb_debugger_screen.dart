@@ -6,12 +6,14 @@ class UsbDebuggerScreen extends StatelessWidget {
   final bool isEnabled;
   final ValueChanged<bool> onToggle;
   final bool isLoading;
+  final VoidCallback? onTap;
 
   const UsbDebuggerScreen({
     super.key,
     required this.isEnabled,
     required this.onToggle,
     required this.isLoading,
+    this.onTap,
   });
 
   @override
@@ -35,11 +37,12 @@ class UsbDebuggerScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const StepCard(
+          StepCard(
             number: 1,
             title: 'Enable Developer Options',
             desc: "Tap 'Build Number' 7 times in 'About Phone' settings.",
             showLinkIcon: true,
+            onTap: onTap,
           ),
           const SizedBox(height: 12),
           const StepCard(
